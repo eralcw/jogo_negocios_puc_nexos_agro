@@ -1,0 +1,200 @@
+/* Nexus Dossiê — visual "terminal de placar" (flat, alto contraste, sem sombras) */
+:root{
+  --bg:#0F110F;
+  --panel:#151815;
+  --panel2:#1A1E1A;
+  --line:#2B312B;
+  --ink:#E9EDE7;
+  --muted:#8E9A8E;
+  --accent:#C7F04A;
+  --accent2:#A9D63B;
+  --danger:#FF6B5E;
+  --warn:#F0B429;
+  --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:var(--sans);font-size:18px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:var(--sans);margin:0 0 .5em;font-weight:800;letter-spacing:.02em}
+h1{font-size:1.15rem;text-transform:uppercase;letter-spacing:.12em}
+h2{font-size:1.05rem;text-transform:uppercase;letter-spacing:.09em;color:var(--ink);position:relative;padding-left:1.1rem}
+h2::before{content:"";position:absolute;left:0;top:.28em;width:.55rem;height:.55rem;background:var(--accent)}
+h3{font-size:.85rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-top:1.4em}
+p{margin:.45em 0 .9em}
+small{font-weight:400;color:var(--muted);font-size:.8em}
+strong{color:var(--ink)}
+code,.mono{font-family:var(--mono)}
+
+/* header */
+.top{
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  padding:.85rem 1.6rem;background:#0A0C0A;border-bottom:1px solid var(--line);
+}
+.brand{display:flex;align-items:center;gap:.9rem}
+.logo{
+  display:grid;place-items:center;width:46px;height:46px;
+  background:transparent;border:1px solid var(--accent);color:var(--accent);
+  font-family:var(--mono);font-weight:700;font-size:1rem;letter-spacing:.06em;
+}
+.brand h1{color:var(--ink);margin:0}
+.brand p{margin:.15rem 0 0;color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.12em}
+.status .pill{background:transparent;color:var(--accent);border-color:var(--accent)}
+
+/* tabs */
+.tabs{
+  display:flex;gap:0;flex-wrap:wrap;padding:0 1.2rem;
+  background:#0A0C0A;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;
+}
+.tabs button{
+  border:0;border-right:1px solid var(--line);background:transparent;
+  padding:.8rem 1rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);cursor:pointer;
+}
+.tabs button:first-child{border-left:1px solid var(--line)}
+.tabs button:hover{color:var(--ink)}
+.tabs button.active{background:var(--accent);color:#0F110F;font-weight:700}
+
+main{max-width:1180px;margin:0 auto;padding:1.4rem 1.2rem 3rem}
+.tab{display:none}
+.tab.active{display:block}
+
+/* panels (substituem os "cards") */
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  padding:1.25rem 1.35rem;margin-bottom:1rem;
+}
+.card>h2:first-child{margin-top:0}
+.intro{border-color:var(--accent);background:var(--panel2)}
+.lead{font-size:1.22rem;line-height:1.5;margin:0 0 .8rem;color:var(--ink)}
+
+/* regras */
+.steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin:.4rem 0 .2rem}
+.step-card{background:var(--panel);padding:.95rem 1rem}
+.step-card strong{display:block;color:var(--ink);margin:.15rem 0 .2rem;font-size:.98rem}
+.step-card p{margin:0;font-size:.86rem;color:var(--muted)}
+.step-n{font-family:var(--mono);font-size:1.5rem;font-weight:700;color:var(--accent);line-height:1}
+.steps{margin:.2rem 0 .4rem;padding-left:1.3rem}
+.steps li{margin:.4rem 0}
+.bullets{margin:.2rem 0 .4rem;padding-left:1.2rem}
+.bullets li{margin:.4rem 0}
+.muted{color:var(--muted);font-size:.88rem}
+.formula-details{margin-top:.8rem;border-top:1px solid var(--line);padding-top:.7rem}
+.formula-details summary{cursor:pointer;font-family:var(--mono);font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);padding:.2rem 0}
+.formula p{margin:.45rem 0;font-size:.95rem}
+.tag{display:inline-block;font-family:var(--mono);font-size:.75rem;color:var(--accent);border:1px solid var(--line);padding:0 .35rem;margin-right:.4rem}
+
+/* tabelas */
+.rules-table{width:100%;border-collapse:collapse;margin:.3rem 0 .6rem}
+.rules-table th,.rules-table td{border-bottom:1px solid var(--line);padding:.6rem .55rem;text-align:left;vertical-align:top}
+.rules-table th{font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;background:transparent}
+.rules-table td{font-size:.95rem}
+.rules-table tr:last-child td{border-bottom:0}
+
+/* config */
+.grid-config{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1rem;margin:.4rem 0 .6rem}
+label{display:flex;flex-direction:column;gap:.35rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+input,select{
+  font-family:var(--mono);font-size:1rem;padding:.55rem .6rem;
+  background:var(--bg);border:1px solid var(--line);color:var(--ink);border-radius:0;
+}
+input:focus,select:focus{outline:none;border-color:var(--accent)}
+.team-names{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.7rem;margin:.4rem 0}
+.team-names label{color:var(--muted)}
+
+/* botões */
+.actions{display:flex;align-items:center;gap:.7rem;margin-top:1.1rem;flex-wrap:wrap}
+.btn{
+  font-family:var(--mono);font-size:.76rem;letter-spacing:.08em;text-transform:uppercase;
+  padding:.75rem 1.1rem;border:1px solid var(--line);background:transparent;color:var(--ink);
+  cursor:pointer;border-radius:0;font-weight:700;
+}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#0F110F}
+.btn.primary:hover{background:var(--accent2);border-color:var(--accent2);color:#0F110F}
+.btn.danger{color:var(--danger);border-color:#5A2A26}
+.btn.danger:hover{background:#2A1513;border-color:var(--danger);color:var(--danger)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.msg{font-family:var(--mono);font-size:.78rem;color:var(--danger)}
+
+/* tabelas de jogo */
+.table-wrap{overflow-x:auto}
+.dec-table,.res-table,.hist-table{width:100%;border-collapse:collapse;margin:.4rem 0}
+.dec-table th,.dec-table td,.res-table th,.res-table td,.hist-table th,.hist-table td{
+  border-bottom:1px solid var(--line);padding:.55rem .5rem;text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+.dec-table th,.res-table th,.hist-table th{
+  font-family:var(--mono);font-size:.68rem;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--muted);font-weight:700;background:transparent;
+}
+.dec-table th:first-child,.dec-table td:first-child,
+.res-table th:first-child,.res-table td:first-child,
+.hist-table th:first-child,.hist-table td:first-child{text-align:left}
+.dec-table td:first-child{font-weight:700;white-space:nowrap}
+.dec-table input,.dec-table select{width:100%;min-width:84px;text-align:right;padding:.45rem}
+.res-table tbody tr:first-child td{background:#1C2418;color:var(--accent);font-weight:700}
+.res-table td,.hist-table td{font-family:var(--mono);font-size:.9rem}
+.neg{color:var(--danger)}
+.pos{color:var(--accent)}
+.badge{
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;
+  border:1px solid var(--warn);color:var(--warn);padding:.05rem .35rem;margin-left:.4rem;
+}
+
+/* resultados */
+.res-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.round-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.pill{
+  display:inline-block;font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;
+  text-transform:uppercase;padding:.3rem .55rem;border:1px solid var(--line);color:var(--muted);
+}
+.pill.soft{color:var(--accent);border-color:var(--line)}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin:.6rem 0 1rem}
+.summary div{background:var(--panel);padding:.7rem .85rem}
+.summary .k{display:block;font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.summary .v{display:block;font-family:var(--mono);font-size:1.35rem;font-weight:700;color:var(--accent);margin-top:.2rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* gráfico */
+.chart{margin:.6rem 0 1rem}
+.bar-row{display:grid;grid-template-columns:150px 1fr 130px;align-items:center;gap:.7rem;margin:.4rem 0}
+.bar-name{font-size:.9rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{background:var(--bg);border:1px solid var(--line);height:26px}
+.bar-fill{display:block;height:100%;background:var(--accent)}
+.bar-val{text-align:right;font-family:var(--mono);font-weight:700;font-size:.9rem;font-variant-numeric:tabular-nums}
+
+/* vitória */
+.winner{background:var(--accent);color:#0F110F;padding:1.2rem 1.4rem;margin:1rem 0;border:1px solid var(--accent)}
+.winner h2{color:#0F110F;padding-left:0}
+.winner h2::before{display:none}
+.winner p{margin:0;color:#0F110F;font-size:1.05rem}
+
+.hist-round{margin-bottom:1.5rem}
+.hist-round h3{color:var(--ink)}
+
+/* erro */
+.err{
+  display:none;margin:0;padding:.8rem 1.2rem;background:#2A1513;color:var(--danger);
+  font-family:var(--mono);font-size:.85rem;border-bottom:1px solid var(--danger);
+}
+
+.foot{padding:1rem 1.4rem 2rem;text-align:center;color:var(--muted);font-size:.72rem;font-family:var(--mono);letter-spacing:.06em;border-top:1px solid var(--line);margin-top:1rem}
+
+@media (max-width:760px){
+  body{font-size:16px}
+  .bar-row{grid-template-columns:100px 1fr 92px}
+  .brand p{display:none}
+  .tabs button{padding:.7rem .7rem;font-size:.66rem}
+}
+@media print{
+  body{background:#fff;color:#111}
+  .tabs,.actions,.foot,.err{display:none}
+  .tab{display:block}
+  .card{border-color:#ccc;background:#fff;break-inside:avoid}
+  h2{color:#111}
+  .rules-table th,.rules-table td{border-color:#ccc}
+}

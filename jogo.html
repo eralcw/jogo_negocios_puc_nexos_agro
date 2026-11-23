@@ -1,0 +1,883 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nexus Dossiê — Jogo de Empresas</title>
+  <style>
+/* Nexus Dossiê — visual "terminal de placar" (flat, alto contraste, sem sombras) */
+:root{
+  --bg:#0F110F;
+  --panel:#151815;
+  --panel2:#1A1E1A;
+  --line:#2B312B;
+  --ink:#E9EDE7;
+  --muted:#8E9A8E;
+  --accent:#C7F04A;
+  --accent2:#A9D63B;
+  --danger:#FF6B5E;
+  --warn:#F0B429;
+  --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:var(--sans);font-size:18px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:var(--sans);margin:0 0 .5em;font-weight:800;letter-spacing:.02em}
+h1{font-size:1.15rem;text-transform:uppercase;letter-spacing:.12em}
+h2{font-size:1.05rem;text-transform:uppercase;letter-spacing:.09em;color:var(--ink);position:relative;padding-left:1.1rem}
+h2::before{content:"";position:absolute;left:0;top:.28em;width:.55rem;height:.55rem;background:var(--accent)}
+h3{font-size:.85rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-top:1.4em}
+p{margin:.45em 0 .9em}
+small{font-weight:400;color:var(--muted);font-size:.8em}
+strong{color:var(--ink)}
+code,.mono{font-family:var(--mono)}
+
+/* header */
+.top{
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  padding:.85rem 1.6rem;background:#0A0C0A;border-bottom:1px solid var(--line);
+}
+.brand{display:flex;align-items:center;gap:.9rem}
+.logo{
+  display:grid;place-items:center;width:46px;height:46px;
+  background:transparent;border:1px solid var(--accent);color:var(--accent);
+  font-family:var(--mono);font-weight:700;font-size:1rem;letter-spacing:.06em;
+}
+.brand h1{color:var(--ink);margin:0}
+.brand p{margin:.15rem 0 0;color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.12em}
+.status .pill{background:transparent;color:var(--accent);border-color:var(--accent)}
+
+/* tabs */
+.tabs{
+  display:flex;gap:0;flex-wrap:wrap;padding:0 1.2rem;
+  background:#0A0C0A;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;
+}
+.tabs button{
+  border:0;border-right:1px solid var(--line);background:transparent;
+  padding:.8rem 1rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);cursor:pointer;
+}
+.tabs button:first-child{border-left:1px solid var(--line)}
+.tabs button:hover{color:var(--ink)}
+.tabs button.active{background:var(--accent);color:#0F110F;font-weight:700}
+
+main{max-width:1180px;margin:0 auto;padding:1.4rem 1.2rem 3rem}
+.tab{display:none}
+.tab.active{display:block}
+
+/* panels (substituem os "cards") */
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  padding:1.25rem 1.35rem;margin-bottom:1rem;
+}
+.card>h2:first-child{margin-top:0}
+.intro{border-color:var(--accent);background:var(--panel2)}
+.lead{font-size:1.22rem;line-height:1.5;margin:0 0 .8rem;color:var(--ink)}
+
+/* regras */
+.steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin:.4rem 0 .2rem}
+.step-card{background:var(--panel);padding:.95rem 1rem}
+.step-card strong{display:block;color:var(--ink);margin:.15rem 0 .2rem;font-size:.98rem}
+.step-card p{margin:0;font-size:.86rem;color:var(--muted)}
+.step-n{font-family:var(--mono);font-size:1.5rem;font-weight:700;color:var(--accent);line-height:1}
+.steps{margin:.2rem 0 .4rem;padding-left:1.3rem}
+.steps li{margin:.4rem 0}
+.bullets{margin:.2rem 0 .4rem;padding-left:1.2rem}
+.bullets li{margin:.4rem 0}
+.muted{color:var(--muted);font-size:.88rem}
+.formula-details{margin-top:.8rem;border-top:1px solid var(--line);padding-top:.7rem}
+.formula-details summary{cursor:pointer;font-family:var(--mono);font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);padding:.2rem 0}
+.formula p{margin:.45rem 0;font-size:.95rem}
+.tag{display:inline-block;font-family:var(--mono);font-size:.75rem;color:var(--accent);border:1px solid var(--line);padding:0 .35rem;margin-right:.4rem}
+
+/* tabelas */
+.rules-table{width:100%;border-collapse:collapse;margin:.3rem 0 .6rem}
+.rules-table th,.rules-table td{border-bottom:1px solid var(--line);padding:.6rem .55rem;text-align:left;vertical-align:top}
+.rules-table th{font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;background:transparent}
+.rules-table td{font-size:.95rem}
+.rules-table tr:last-child td{border-bottom:0}
+
+/* config */
+.grid-config{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1rem;margin:.4rem 0 .6rem}
+label{display:flex;flex-direction:column;gap:.35rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+input,select{
+  font-family:var(--mono);font-size:1rem;padding:.55rem .6rem;
+  background:var(--bg);border:1px solid var(--line);color:var(--ink);border-radius:0;
+}
+input:focus,select:focus{outline:none;border-color:var(--accent)}
+.team-names{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.7rem;margin:.4rem 0}
+.team-names label{color:var(--muted)}
+
+/* botões */
+.actions{display:flex;align-items:center;gap:.7rem;margin-top:1.1rem;flex-wrap:wrap}
+.btn{
+  font-family:var(--mono);font-size:.76rem;letter-spacing:.08em;text-transform:uppercase;
+  padding:.75rem 1.1rem;border:1px solid var(--line);background:transparent;color:var(--ink);
+  cursor:pointer;border-radius:0;font-weight:700;
+}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#0F110F}
+.btn.primary:hover{background:var(--accent2);border-color:var(--accent2);color:#0F110F}
+.btn.danger{color:var(--danger);border-color:#5A2A26}
+.btn.danger:hover{background:#2A1513;border-color:var(--danger);color:var(--danger)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.msg{font-family:var(--mono);font-size:.78rem;color:var(--danger)}
+
+/* tabelas de jogo */
+.table-wrap{overflow-x:auto}
+.dec-table,.res-table,.hist-table{width:100%;border-collapse:collapse;margin:.4rem 0}
+.dec-table th,.dec-table td,.res-table th,.res-table td,.hist-table th,.hist-table td{
+  border-bottom:1px solid var(--line);padding:.55rem .5rem;text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+.dec-table th,.res-table th,.hist-table th{
+  font-family:var(--mono);font-size:.68rem;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--muted);font-weight:700;background:transparent;
+}
+.dec-table th:first-child,.dec-table td:first-child,
+.res-table th:first-child,.res-table td:first-child,
+.hist-table th:first-child,.hist-table td:first-child{text-align:left}
+.dec-table td:first-child{font-weight:700;white-space:nowrap}
+.dec-table input,.dec-table select{width:100%;min-width:84px;text-align:right;padding:.45rem}
+.res-table tbody tr:first-child td{background:#1C2418;color:var(--accent);font-weight:700}
+.res-table td,.hist-table td{font-family:var(--mono);font-size:.9rem}
+.neg{color:var(--danger)}
+.pos{color:var(--accent)}
+.badge{
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;
+  border:1px solid var(--warn);color:var(--warn);padding:.05rem .35rem;margin-left:.4rem;
+}
+
+/* resultados */
+.res-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.round-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.pill{
+  display:inline-block;font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;
+  text-transform:uppercase;padding:.3rem .55rem;border:1px solid var(--line);color:var(--muted);
+}
+.pill.soft{color:var(--accent);border-color:var(--line)}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin:.6rem 0 1rem}
+.summary div{background:var(--panel);padding:.7rem .85rem}
+.summary .k{display:block;font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.summary .v{display:block;font-family:var(--mono);font-size:1.35rem;font-weight:700;color:var(--accent);margin-top:.2rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* gráfico */
+.chart{margin:.6rem 0 1rem}
+.bar-row{display:grid;grid-template-columns:150px 1fr 130px;align-items:center;gap:.7rem;margin:.4rem 0}
+.bar-name{font-size:.9rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{background:var(--bg);border:1px solid var(--line);height:26px}
+.bar-fill{display:block;height:100%;background:var(--accent)}
+.bar-val{text-align:right;font-family:var(--mono);font-weight:700;font-size:.9rem;font-variant-numeric:tabular-nums}
+
+/* vitória */
+.winner{background:var(--accent);color:#0F110F;padding:1.2rem 1.4rem;margin:1rem 0;border:1px solid var(--accent)}
+.winner h2{color:#0F110F;padding-left:0}
+.winner h2::before{display:none}
+.winner p{margin:0;color:#0F110F;font-size:1.05rem}
+
+.hist-round{margin-bottom:1.5rem}
+.hist-round h3{color:var(--ink)}
+
+/* erro */
+.err{
+  display:none;margin:0;padding:.8rem 1.2rem;background:#2A1513;color:var(--danger);
+  font-family:var(--mono);font-size:.85rem;border-bottom:1px solid var(--danger);
+}
+
+.foot{padding:1rem 1.4rem 2rem;text-align:center;color:var(--muted);font-size:.72rem;font-family:var(--mono);letter-spacing:.06em;border-top:1px solid var(--line);margin-top:1rem}
+
+@media (max-width:760px){
+  body{font-size:16px}
+  .bar-row{grid-template-columns:100px 1fr 92px}
+  .brand p{display:none}
+  .tabs button{padding:.7rem .7rem;font-size:.66rem}
+}
+@media print{
+  body{background:#fff;color:#111}
+  .tabs,.actions,.foot,.err{display:none}
+  .tab{display:block}
+  .card{border-color:#ccc;background:#fff;break-inside:avoid}
+  h2{color:#111}
+  .rules-table th,.rules-table td{border-color:#ccc}
+}
+
+</style>
+  <script>
+  window.NX = window.NX || {
+    _msg: function(){ alert("O jogo nao carregou neste visualizador. Abra o arquivo jogo.html direto no navegador (Chrome, Edge ou Firefox), com duplo clique."); },
+    go: function(){ this._msg(); }, start: function(){ this._msg(); }, calc: function(){ this._msg(); },
+    csv: function(){ this._msg(); }, reset: function(){ this._msg(); }, configChanged: function(){}
+  };
+  </script>
+  <script>window.onerror=function(m,s,l){var d=document.getElementById("err");if(d){d.style.display="block";d.textContent="Erro no jogo: "+m+" (linha "+l+")";}};</script>
+
+</head>
+<body>
+<div id="err" class="err"></div>
+<noscript><div class="err">O JavaScript está desativado neste navegador. Ative o JavaScript ou abra o arquivo em outro navegador.</div></noscript>
+
+<header class="top">
+  <div class="brand">
+    <span class="logo">NX</span>
+    <div>
+      <h1>Nexus Dossiê</h1>
+      <p>Jogo de empresas · disputa pelo mercado de dossiês regulatórios</p>
+    </div>
+  </div>
+  <div class="status">
+    <span id="roundPill" class="pill">—</span>
+  </div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="regras" class="active" onclick="NX.go('regras')">Regras</button>
+  <button data-tab="config" onclick="NX.go('config')">Configuração</button>
+  <button data-tab="decisoes" onclick="NX.go('decisoes')">Decisões</button>
+  <button data-tab="resultados" onclick="NX.go('resultados')">Resultados</button>
+  <button data-tab="historico" onclick="NX.go('historico')">Histórico</button>
+</nav>
+
+<main>
+
+  <!-- ============ REGRAS ============ -->
+  <section id="tab-regras" class="tab active">
+    <div class="card intro">
+      <p class="lead">Vocês administram uma empresa que vende agentes de IA para dossiês regulatórios. A cada rodada, cada mesa toma <strong>4 decisões</strong>. No fim, vence quem tiver o <strong>maior caixa acumulado</strong>.</p>
+      <div class="actions">
+        <button class="btn primary" onclick="NX.go('config')">Começar: configurar as mesas</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Uma rodada em 4 passos</h2>
+      <div class="steps-grid">
+        <div class="step-card"><span class="step-n">1</span><strong>O mercado é anunciado</strong><p>Ex.: “esta rodada tem 16 clientes”.</p></div>
+        <div class="step-card"><span class="step-n">2</span><strong>Cada mesa decide</strong><p>Preço, marketing, qualidade e capacidade.</p></div>
+        <div class="step-card"><span class="step-n">3</span><strong>O facilitador lança</strong><p>As decisões de todas as mesas entram no sistema.</p></div>
+        <div class="step-card"><span class="step-n">4</span><strong>O placar aparece</strong><p>Clientes, receita, custo, lucro e caixa.</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>As 4 decisões, em linguagem simples</h2>
+      <table class="rules-table">
+        <thead>
+          <tr><th>Decisão</th><th>O que é</th><th>Efeito</th><th>Dica</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Preço</strong><br><small>R$ 5 a 12 mil</small></td>
+            <td>Quanto vocês cobram por cliente, por mês.</td>
+            <td><strong>Caro:</strong> menos clientes, mas mais receita por cliente.<br><strong>Barato:</strong> mais clientes, menos receita por cliente.</td>
+            <td>Não existe preço “certo”. Depende da estratégia.</td>
+          </tr>
+          <tr>
+            <td><strong>Marketing</strong><br><small>R$ 0 a 20 mil</small></td>
+            <td>Quanto gastam para serem conhecidos.</td>
+            <td>Mais marketing = mais clientes. Mas o gasto sai do lucro.</td>
+            <td>Não gaste para atrair mais do que consegue atender.</td>
+          </tr>
+          <tr>
+            <td><strong>Qualidade</strong><br><small>R$ 0 a 20 mil</small></td>
+            <td>Quanto investem em compliance e confiança.</td>
+            <td>Mais qualidade = mais clientes e menos risco.<br><strong>Abaixo de R$ 5 mil: perde 1 cliente.</strong></td>
+            <td>Não zere: o incidente custa mais que a economia.</td>
+          </tr>
+          <tr>
+            <td><strong>Capacidade</strong><br><small>4, 6 ou 8 clientes</small></td>
+            <td>Quantos clientes vocês conseguem atender.</td>
+            <td>Mais capacidade = atende mais, mas custa mais.<br>Se atrair mais que a capacidade, o cliente vai para o concorrente.</td>
+            <td>Combine a capacidade com o marketing.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Exemplo de uma rodada (mercado de 16 clientes)</h2>
+      <div class="table-wrap">
+        <table class="rules-table">
+          <thead>
+            <tr><th>Mesa</th><th>Preço</th><th>Marketing</th><th>Qualidade</th><th>Capacidade</th><th>Clientes</th><th>Lucro</th><th>Caixa</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Mesa 1</td><td>8</td><td>10</td><td>10</td><td>6</td><td>4</td><td>R$ 39 mil</td><td>R$ 39 mil</td></tr>
+            <tr><td>Mesa 2</td><td>6</td><td>15</td><td>5</td><td>8</td><td>6</td><td>R$ 39 mil</td><td>R$ 39 mil</td></tr>
+            <tr><td>Mesa 3</td><td>11</td><td>5</td><td>15</td><td>6</td><td>3</td><td>R$ 44 mil</td><td>R$ 44 mil</td></tr>
+            <tr><td>Mesa 4</td><td>8</td><td>5</td><td>5</td><td>4</td><td>3</td><td>R$ 33 mil</td><td>R$ 33 mil</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted">A Mesa 3 cobrou mais caro e investiu em qualidade: ganhou menos clientes, mas teve o maior lucro. A Mesa 2 comprou volume com preço baixo. Nenhuma está “errada” — o jogo premia a estratégia coerente, não o lance mais alto em uma variável.</p>
+    </div>
+
+    <div class="card">
+      <h2>Como o placar é calculado</h2>
+      <p>Em três ideias:</p>
+      <ol class="steps">
+        <li><strong>Quem é mais atrativo ganha mais clientes.</strong> Qualidade e marketing aumentam a atratividade; preço alto diminui.</li>
+        <li><strong>Ninguém atende além da capacidade.</strong> O cliente que não cabe vai para um concorrente com vaga.</li>
+        <li><strong>Lucro = receita − custos.</strong> Receita é clientes × preço × 3 meses. Custos são o fixo, o que vocês gastaram e o custo por cliente.</li>
+      </ol>
+      <details class="formula-details">
+        <summary>Ver as fórmulas (para quem quiser conferir)</summary>
+        <div class="formula">
+          <p><span class="tag">1</span> <strong>Atratividade</strong> = (1 + qualidade÷10) × (1 + marketing÷10) ÷ (preço÷8)<sup>1,5</sup></p>
+          <p><span class="tag">2</span> <strong>Clientes</strong> = mercado × (atratividade ÷ soma das atratividades), limitado pela capacidade</p>
+          <p><span class="tag">3</span> <strong>Receita</strong> = clientes × preço × 3 meses</p>
+          <p><span class="tag">4</span> <strong>Custos</strong> = 15 (fixo) + marketing + qualidade + custo da capacidade + 2 × clientes</p>
+          <p><span class="tag">5</span> <strong>Lucro</strong> = receita − custos · <strong>Caixa</strong> = caixa anterior + lucro</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="card">
+      <h2>Dicas para a primeira rodada</h2>
+      <ul class="bullets">
+        <li>Escolham uma estratégia antes de decidir: <strong>volume</strong> (preço baixo), <strong>valor</strong> (preço alto + qualidade) ou <strong>equilíbrio</strong>.</li>
+        <li>Olhem a capacidade antes do marketing: não adianta atrair cliente que não cabe.</li>
+        <li>Não zerem a qualidade: abaixo de R$ 5 mil vocês perdem cliente.</li>
+        <li>O vencedor é o <strong>caixa acumulado</strong>, não o lucro de uma rodada só.</li>
+      </ul>
+      <div class="actions">
+        <button class="btn primary" onclick="NX.go('config')">Começar: configurar as mesas</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONFIGURAÇÃO ============ -->
+  <section id="tab-config" class="tab">
+    <div class="card">
+      <h2>Configuração da partida</h2>
+      <div class="grid-config">
+        <label>Número de mesas
+          <input id="cfgTeams" type="number" min="2" max="8" value="4" oninput="NX.configChanged()">
+        </label>
+        <label>Rodadas
+          <input id="cfgRounds" type="number" min="1" max="5" value="3">
+        </label>
+        <label>Caixa inicial (R$ mil)
+          <input id="cfgCash" type="number" min="0" max="500" value="0">
+        </label>
+        <label>Mercado por rodada
+          <input id="cfgMarket" type="text" value="16, 20, 24" placeholder="ex.: 16, 20, 24">
+        </label>
+      </div>
+      <p class="muted">O mercado é o número de clientes disponíveis em cada rodada. Se você informar menos valores que rodadas, o último se repete.</p>
+      <h3>Nomes das mesas</h3>
+      <div id="teamNames" class="team-names"></div>
+      <div class="actions">
+        <button class="btn primary" id="btnStart" onclick="NX.start()">Criar jogo</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DECISÕES ============ -->
+  <section id="tab-decisoes" class="tab">
+    <div class="card">
+      <div class="round-head">
+        <h2 id="decTitle">Decisões da rodada</h2>
+        <span id="decMarket" class="pill soft"></span>
+      </div>
+      <p class="muted" id="decHint"></p>
+      <div class="table-wrap">
+        <table class="dec-table" id="decTable">
+          <thead>
+            <tr>
+              <th>Mesa</th>
+              <th>Preço<br><small>R$ mil/cliente/mês</small></th>
+              <th>Marketing<br><small>R$ mil</small></th>
+              <th>Qualidade<br><small>R$ mil</small></th>
+              <th>Capacidade<br><small>clientes</small></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="btnCalc" onclick="NX.calc()">Calcular rodada</button>
+        <span id="calcMsg" class="msg"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RESULTADOS ============ -->
+  <section id="tab-resultados" class="tab">
+    <div id="resWrap"></div>
+  </section>
+
+  <!-- ============ HISTÓRICO ============ -->
+  <section id="tab-historico" class="tab">
+    <div class="card">
+      <h2>Histórico</h2>
+      <div id="histWrap"></div>
+      <div class="actions">
+        <button class="btn" id="btnCsv" onclick="NX.csv()">Exportar CSV</button>
+        <button class="btn danger" id="btnReset" onclick="NX.reset()">Nova partida</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <span>Nexus Agro · jogo de empresas para a disciplina de Empreendedorismo em CD e IA</span>
+</footer>
+
+<script>
+/*
+ * Nexus Dossiê — motor de simulação (puro, sem DOM)
+ * Unidades monetárias em R$ mil.
+ * Funciona no navegador (window.Sim) e no Node (module.exports).
+ */
+(function (global) {
+  "use strict";
+
+  const DEFAULTS = {
+    basePrice: 8,        // preço de referência (R$ mil/cliente/mês)
+    priceExponent: 1.5,  // sensibilidade a preço
+    fixedCost: 15,       // custo fixo por rodada (R$ mil)
+    varCostPerClient: 2, // custo variável por cliente na rodada (R$ mil)
+    monthsPerRound: 3,   // meses faturados por rodada
+    qualityFloor: 5,     // abaixo disso, incidente de compliance: perde 1 cliente
+    capacityCost: { 4: 8, 6: 14, 8: 22 }, // custo de equipe por capacidade (R$ mil/rodada)
+    marketSizes: [16, 20, 24],
+    startCash: 0,
+    rounds: 3,
+  };
+
+  function clamp(x, lo, hi) { return Math.max(lo, Math.min(hi, x)); }
+
+  // Atratividade de uma empresa: qualidade e marketing atraem; preço afasta.
+  function attractiveness(d, cfg) {
+    const price = Math.max(1, Number(d.price) || cfg.basePrice);
+    const q = Math.max(0, Number(d.quality) || 0);
+    const m = Math.max(0, Number(d.marketing) || 0);
+    return ((1 + q / 10) * (1 + m / 10)) / Math.pow(price / cfg.basePrice, cfg.priceExponent);
+  }
+
+  /*
+   * Distribui os clientes do mercado entre as empresas.
+   * - proporcional à atratividade (método do maior resto)
+   * - respeita a capacidade de cada empresa
+   * - redistribui quem ficou sem vaga para quem tem espaço
+   * - aplica o piso de qualidade (incidente de compliance)
+   */
+  function allocate(decisions, marketSize, cfg) {
+    const n = decisions.length;
+    const attrs = decisions.map((d) => Math.max(0.0001, attractiveness(d, cfg)));
+    const total = attrs.reduce((a, b) => a + b, 0);
+    const caps = decisions.map((d) => clamp(Number(d.capacity) || 4, 4, 8));
+
+    // 1) cota bruta e parte inteira
+    const raw = attrs.map((a) => (marketSize * a) / total);
+    let alloc = raw.map((r) => Math.floor(r));
+    let assigned = alloc.reduce((a, b) => a + b, 0);
+
+    // 2) maior resto para fechar o mercado
+    const order = raw
+      .map((r, i) => ({ i, frac: r - Math.floor(r) }))
+      .sort((a, b) => b.frac - a.frac);
+    let k = 0;
+    while (assigned < marketSize && k < order.length * 3) {
+      const idx = order[k % n].i;
+      if (alloc[idx] < caps[idx]) { alloc[idx] += 1; assigned += 1; }
+      k += 1;
+      if (k > n * 4) break;
+    }
+
+    // 3) respeita capacidade e acumula excedente
+    let excess = 0;
+    for (let i = 0; i < n; i++) {
+      if (alloc[i] > caps[i]) { excess += alloc[i] - caps[i]; alloc[i] = caps[i]; }
+    }
+
+    // 4) redistribui o excedente para quem tem vaga (ponderado por atratividade)
+    let guard = 0;
+    while (excess > 0 && guard < 1000) {
+      const takers = [];
+      for (let i = 0; i < n; i++) if (alloc[i] < caps[i]) takers.push(i);
+      if (takers.length === 0) break;
+      const wsum = takers.reduce((a, i) => a + attrs[i], 0);
+      // dá 1 cliente por vez ao de maior "demanda reprimida relativa"
+      let best = takers[0], bestScore = -1;
+      for (const i of takers) {
+        const score = (attrs[i] / wsum) * (caps[i] - alloc[i]);
+        if (score > bestScore) { bestScore = score; best = i; }
+      }
+      alloc[best] += 1;
+      excess -= 1;
+      guard += 1;
+    }
+
+    // 5) piso de qualidade
+    const incident = decisions.map((d, i) => {
+      const q = Number(d.quality) || 0;
+      if (q < cfg.qualityFloor && alloc[i] > 0) { alloc[i] -= 1; return true; }
+      return false;
+    });
+
+    const served = alloc.reduce((a, b) => a + b, 0);
+    return { clients: alloc, incident, unserved: Math.max(0, marketSize - served) };
+  }
+
+  // Calcula uma rodada e devolve os resultados por empresa.
+  function runRound(state, decisions, cfg) {
+    const msz = cfg.marketSizes[state.roundIndex];
+    const marketSize = (msz === undefined || msz === null) ? cfg.marketSizes[cfg.marketSizes.length - 1] : msz;
+    const { clients, incident, unserved } = allocate(decisions, marketSize, cfg);
+
+    const results = state.teams.map((team, i) => {
+      const d = decisions[i];
+      const c = clients[i];
+      const revenue = c * (Number(d.price) || 0) * cfg.monthsPerRound;
+      const tc = cfg.capacityCost[Number(d.capacity)];
+      const teamCost = (tc === undefined) ? cfg.capacityCost[6] : tc;
+      const costs =
+        cfg.fixedCost +
+        (Number(d.marketing) || 0) +
+        (Number(d.quality) || 0) +
+        teamCost +
+        cfg.varCostPerClient * c;
+      const profit = revenue - costs;
+      const cash = (team.cash || 0) + profit;
+      return {
+        name: team.name,
+        price: Number(d.price),
+        marketing: Number(d.marketing),
+        quality: Number(d.quality),
+        capacity: Number(d.capacity),
+        clients: c,
+        revenue,
+        costs,
+        profit,
+        cash,
+        incident: incident[i],
+      };
+    });
+
+    return { round: state.roundIndex + 1, marketSize, unserved, results };
+  }
+
+  // Aplica o resultado ao estado (mutável) e guarda no histórico.
+  function applyRound(state, roundResult) {
+    roundResult.results.forEach((r, i) => { state.teams[i].cash = r.cash; });
+    state.history.push(roundResult);
+    state.roundIndex += 1;
+    return state;
+  }
+
+  function ranking(results) {
+    return [...results].sort((a, b) => b.cash - a.cash);
+  }
+
+  const API = { DEFAULTS, attractiveness, allocate, runRound, applyRound, ranking, clamp };
+  if (typeof module !== "undefined" && module.exports) module.exports = API;
+  else global.Sim = API;
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
+/* Nexus Dossiê — interface (JavaScript puro, sem dependências)
+ * Interação ligada por onclick direto no HTML + boot imediato.
+ */
+(function () {
+  "use strict";
+
+  var KEY = "nexus-jogo-v2";
+  var booted = false;
+
+  function $(sel) { return document.querySelector(sel); }
+  function $$(sel, root) {
+    var base = (root && typeof root.querySelectorAll === "function") ? root : document;
+    return Array.prototype.slice.call(base.querySelectorAll(sel));
+  }
+
+  function defDec() { return { price: 8, marketing: 8, quality: 8, capacity: 6 }; }
+
+  var S = load() || {
+    started: false, teams: [],
+    config: { rounds: 3, marketSizes: [16, 20, 24], startCash: 0 },
+    roundIndex: 0, history: [], decisions: [], lastResult: null, finished: false
+  };
+
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  function load() { try { var raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : null; } catch (e) { return null; } }
+
+  function fmt(n) { return "R$ " + Math.round(n).toLocaleString("pt-BR") + " mil"; }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function clampInt(v, lo, hi, dflt) { var n = parseInt(v, 10); if (isNaN(n)) return dflt; return Math.max(lo, Math.min(hi, n)); }
+  function clampNum(v, lo, hi, dflt) { var n = parseFloat(v); if (isNaN(n)) return dflt; return Math.max(lo, Math.min(hi, n)); }
+
+  /* ---------------- navegação ---------------- */
+  function go(name) {
+    $$(".tabs button").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-tab") === name); });
+    $$(".tab").forEach(function (t) { t.classList.toggle("active", t.id === "tab-" + name); });
+    if (name === "decisoes") renderDecisions();
+    if (name === "resultados") renderResults();
+    if (name === "historico") renderHistory();
+    if (name === "config") renderConfig();
+  }
+
+  /* ---------------- cabeçalho ---------------- */
+  function renderHeader() {
+    var el = $("#roundPill");
+    if (!el) return;
+    if (!S.started) { el.textContent = "AGUARDANDO CONFIGURAÇÃO"; return; }
+    if (S.finished) { el.textContent = "PARTIDA ENCERRADA"; return; }
+    el.textContent = "RODADA " + (S.roundIndex + 1) + " / " + S.config.rounds;
+  }
+
+  /* ---------------- configuração ---------------- */
+  function renderConfig() {
+    var cfgTeams = $("#cfgTeams");
+    if (!cfgTeams) return;
+    var n = clampInt(cfgTeams.value, 2, 8, 4);
+    var wrap = $("#teamNames");
+    var current = $$("input", wrap).map(function (i) { return i.value; });
+    wrap.innerHTML = "";
+    for (var i = 0; i < n; i++) {
+      var label = document.createElement("label");
+      label.appendChild(document.createTextNode("MESA " + (i + 1)));
+      var inp = document.createElement("input");
+      inp.type = "text";
+      inp.value = current[i] || "Mesa " + (i + 1);
+      label.appendChild(inp);
+      wrap.appendChild(label);
+    }
+  }
+
+  function parseMarket(txt, rounds) {
+    var vals = String(txt || "").split(/[,;\s]+/).map(function (x) { return parseInt(x, 10); }).filter(function (x) { return !isNaN(x) && x > 0; });
+    if (!vals.length) { vals = [16, 20, 24]; }
+    while (vals.length < rounds) { vals.push(vals[vals.length - 1]); }
+    return vals.slice(0, rounds);
+  }
+
+  function startGame() {
+    var n = clampInt($("#cfgTeams").value, 2, 8, 4);
+    var rounds = clampInt($("#cfgRounds").value, 1, 5, 3);
+    var cash = clampInt($("#cfgCash").value, 0, 500, 0);
+    var market = parseMarket($("#cfgMarket").value, rounds);
+    var names = $$("input", $("#teamNames")).map(function (i, k) { return (i.value.trim() || "Mesa " + (k + 1)); });
+
+    var teams = [];
+    for (var i = 0; i < names.length; i++) { teams.push({ name: names[i], cash: cash }); }
+
+    S = {
+      started: true, teams: teams,
+      config: { rounds: rounds, marketSizes: market, startCash: cash },
+      roundIndex: 0, history: [], decisions: names.map(defDec), lastResult: null, finished: false
+    };
+    save(); renderHeader(); go("decisoes");
+  }
+
+  /* ---------------- decisões ---------------- */
+  function marketFor(idx) {
+    var m = S.config.marketSizes;
+    var v = m[idx];
+    return (v === undefined || v === null) ? m[m.length - 1] : v;
+  }
+
+  function renderDecisions() {
+    if (!S.started) { go("config"); return; }
+    var round = S.roundIndex + 1;
+    $("#decTitle").textContent = "Decisões da rodada " + round;
+    $("#decMarket").textContent = "MERCADO: " + marketFor(S.roundIndex) + " CLIENTES";
+    $("#decHint").textContent = "Capacidade 4 custa R$ 8 mil; 6 custa R$ 14 mil; 8 custa R$ 22 mil.";
+
+    var tbody = $("#decTable tbody");
+    tbody.innerHTML = "";
+    S.teams.forEach(function (t, i) {
+      var d = S.decisions[i] || defDec();
+      var tr = document.createElement("tr");
+      tr.innerHTML =
+        "<td>" + esc(t.name) + "</td>" +
+        '<td><input type="number" min="5" max="12" step="0.5" value="' + d.price + '" data-k="price"></td>' +
+        '<td><input type="number" min="0" max="20" step="1" value="' + d.marketing + '" data-k="marketing"></td>' +
+        '<td><input type="number" min="0" max="20" step="1" value="' + d.quality + '" data-k="quality"></td>' +
+        '<td><select data-k="capacity">' +
+        '<option value="4"' + (d.capacity === 4 ? " selected" : "") + ">4</option>" +
+        '<option value="6"' + (d.capacity === 6 ? " selected" : "") + ">6</option>" +
+        '<option value="8"' + (d.capacity === 8 ? " selected" : "") + ">8</option>" +
+        "</select></td>";
+      tbody.appendChild(tr);
+    });
+    $("#calcMsg").textContent = "";
+  }
+
+  function calculate() {
+    if (!S.started) { go("config"); return; }
+    if (S.finished) { go("resultados"); return; }
+
+    var rows = $$("#decTable tbody tr");
+    var decisions = rows.map(function (tr) {
+      function get(k) { return tr.querySelector('[data-k="' + k + '"]').value; }
+      return {
+        price: clampNum(get("price"), 5, 12, 8),
+        marketing: clampNum(get("marketing"), 0, 20, 8),
+        quality: clampNum(get("quality"), 0, 20, 8),
+        capacity: Number(get("capacity"))
+      };
+    });
+
+    S.decisions = decisions;
+    var cfg = Object.assign({}, Sim.DEFAULTS, { marketSizes: S.config.marketSizes });
+    var result = Sim.runRound(S, decisions, cfg);
+    Sim.applyRound(S, result);
+    S.lastResult = result;
+    if (S.roundIndex >= S.config.rounds) { S.finished = true; }
+    save(); renderHeader(); go("resultados");
+  }
+
+  /* ---------------- resultados ---------------- */
+  function renderResults() {
+    var wrap = $("#resWrap");
+    if (!S.lastResult) {
+      wrap.innerHTML = '<div class="card"><h2>Resultados</h2><p class="muted">Ainda não há rodada calculada. Vá em Decisões e clique em Calcular rodada.</p></div>';
+      return;
+    }
+    var r = S.lastResult;
+    var ranked = Sim.ranking(r.results);
+    var max = 1;
+    ranked.forEach(function (x) { if (Math.abs(x.cash) > max) max = Math.abs(x.cash); });
+    var leader = ranked[0];
+
+    var rows = ranked.map(function (x, i) {
+      return "<tr>" +
+        "<td>" + (i + 1) + "º</td>" +
+        "<td>" + esc(x.name) + (x.incident ? ' <span class="badge">INCIDENTE</span>' : "") + "</td>" +
+        "<td>" + x.clients + "</td>" +
+        "<td>" + fmt(x.revenue) + "</td>" +
+        "<td>" + fmt(x.costs) + "</td>" +
+        '<td class="' + (x.profit < 0 ? "neg" : "pos") + '">' + fmt(x.profit) + "</td>" +
+        "<td><strong>" + fmt(x.cash) + "</strong></td>" +
+        "</tr>";
+    }).join("");
+
+    var bars = ranked.map(function (x) {
+      var w = Math.max(2, (Math.abs(x.cash) / max) * 100);
+      var color = x.cash < 0 ? "background:#FF6B5E" : "";
+      return '<div class="bar-row"><span class="bar-name">' + esc(x.name) + "</span>" +
+        '<span class="bar-track"><span class="bar-fill" style="width:' + w + "%;" + color + '"></span></span>' +
+        '<span class="bar-val ' + (x.cash < 0 ? "neg" : "") + '">' + fmt(x.cash) + "</span></div>";
+    }).join("");
+
+    var html =
+      '<div class="card">' +
+        '<div class="res-head"><h2>Resultado da rodada ' + r.round + "</h2>" +
+        '<span class="pill soft">MERCADO: ' + r.marketSize + " CLIENTES</span></div>" +
+        '<div class="summary">' +
+          '<div><span class="k">Líder no caixa</span><span class="v">' + esc(leader.name) + "</span></div>" +
+          '<div><span class="k">Caixa do líder</span><span class="v">' + fmt(leader.cash) + "</span></div>" +
+          '<div><span class="k">Não atendidos</span><span class="v">' + r.unserved + "</span></div>" +
+          '<div><span class="k">Rodada</span><span class="v">' + r.round + " / " + S.config.rounds + "</span></div>" +
+        "</div>" +
+        '<div class="table-wrap"><table class="res-table"><thead><tr>' +
+          "<th>#</th><th>Empresa</th><th>Clientes</th><th>Receita</th><th>Custos</th><th>Lucro</th><th>Caixa</th>" +
+        "</tr></thead><tbody>" + rows + "</tbody></table></div>" +
+        "<h3>Caixa acumulado</h3>" +
+        '<div class="chart">' + bars + "</div>" +
+      "</div>";
+
+    if (S.finished) {
+      html += '<div class="winner"><h2>Resultado final</h2><p><strong>' + esc(leader.name) + "</strong> venceu com caixa de " + fmt(leader.cash) + ".</p></div>" +
+        '<div class="actions"><button class="btn primary" onclick="NX.go(\'historico\')">Ver histórico</button>' +
+        '<button class="btn" onclick="NX.reset()">Nova partida</button></div>';
+    } else {
+      html += '<div class="actions"><button class="btn primary" onclick="NX.go(\'decisoes\')">Próxima rodada</button></div>';
+    }
+
+    wrap.innerHTML = html;
+  }
+
+  /* ---------------- histórico ---------------- */
+  function renderHistory() {
+    var wrap = $("#histWrap");
+    if (!S.history.length) { wrap.innerHTML = '<p class="muted">Nenhuma rodada calculada ainda.</p>'; return; }
+    wrap.innerHTML = S.history.map(function (r) {
+      var rows = r.results.map(function (x) {
+        return "<tr><td>" + esc(x.name) + "</td><td>" + x.price + "</td><td>" + x.marketing + "</td><td>" + x.quality + "</td><td>" + x.capacity + "</td><td>" + x.clients + "</td>" +
+          '<td class="' + (x.profit < 0 ? "neg" : "pos") + '">' + fmt(x.profit) + "</td><td>" + fmt(x.cash) + "</td></tr>";
+      }).join("");
+      return '<div class="hist-round"><h3>Rodada ' + r.round + " · mercado de " + r.marketSize + " clientes</h3>" +
+        '<table class="hist-table"><thead><tr><th>Empresa</th><th>Preço</th><th>Marketing</th><th>Qualidade</th><th>Capacidade</th><th>Clientes</th><th>Lucro</th><th>Caixa</th></tr></thead><tbody>' +
+        rows + "</tbody></table></div>";
+    }).join("");
+  }
+
+  /* ---------------- utilidades ---------------- */
+  function exportCsv() {
+    if (!S.history.length) { alert("Ainda não há resultados para exportar."); return; }
+    var lines = ["rodada;empresa;preco_mil;marketing_mil;qualidade_mil;capacidade;clientes;receita_mil;custos_mil;lucro_mil;caixa_mil"];
+    S.history.forEach(function (r) {
+      r.results.forEach(function (x) {
+        lines.push([r.round, x.name, x.price, x.marketing, x.quality, x.capacity, x.clients, Math.round(x.revenue), Math.round(x.costs), Math.round(x.profit), Math.round(x.cash)].join(";"));
+      });
+    });
+    var blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "nexus-dossie-resultados.csv";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function resetGame() {
+    if (!confirm("Começar uma nova partida? Os resultados atuais serão apagados.")) return;
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    S = { started: false, teams: [], config: { rounds: 3, marketSizes: [16, 20, 24], startCash: 0 }, roundIndex: 0, history: [], decisions: [], lastResult: null, finished: false };
+    renderHeader(); go("config");
+  }
+
+  function demoState() {
+    var st = { teams: [{ name: "Mesa 1", cash: 0 }, { name: "Mesa 2", cash: 0 }, { name: "Mesa 3", cash: 0 }, { name: "Mesa 4", cash: 0 }], roundIndex: 0, history: [] };
+    var rounds = [
+      [{ price: 8, marketing: 10, quality: 10, capacity: 6 }, { price: 6, marketing: 15, quality: 5, capacity: 8 }, { price: 11, marketing: 5, quality: 15, capacity: 6 }, { price: 8, marketing: 5, quality: 5, capacity: 4 }],
+      [{ price: 9, marketing: 8, quality: 8, capacity: 6 }, { price: 7, marketing: 12, quality: 8, capacity: 8 }, { price: 10, marketing: 6, quality: 15, capacity: 6 }, { price: 8, marketing: 8, quality: 10, capacity: 6 }],
+      [{ price: 10, marketing: 6, quality: 10, capacity: 6 }, { price: 7, marketing: 10, quality: 10, capacity: 8 }, { price: 9, marketing: 8, quality: 14, capacity: 6 }, { price: 8, marketing: 10, quality: 12, capacity: 6 }]
+    ];
+    rounds.forEach(function (dec) { var r = Sim.runRound(st, dec, Sim.DEFAULTS); Sim.applyRound(st, r); st.lastResult = r; });
+    return { started: true, teams: st.teams, config: { rounds: 3, marketSizes: [16, 20, 24], startCash: 0 }, roundIndex: 3, history: st.history, decisions: rounds[2], lastResult: st.lastResult, finished: true };
+  }
+
+  /* ---------------- boot ---------------- */
+  function boot() {
+    if (booted) return;
+    booted = true;
+    var wantDemo = (typeof window !== "undefined" && window.__DEMO__) || (typeof location !== "undefined" && location.search.indexOf("demo") >= 0);
+    if (wantDemo) { S = demoState(); save(); renderHeader(); go("resultados"); return; }
+    renderConfig();
+    renderHeader();
+    if (S.started) {
+      if (S.finished && S.lastResult) { go("resultados"); } else { go("decisoes"); }
+    } else {
+      go("regras");
+    }
+  }
+
+  /* expõe para os onclick do HTML */
+  window.NX = {
+    go: go,
+    start: startGame,
+    calc: calculate,
+    csv: exportCsv,
+    reset: resetGame,
+    configChanged: renderConfig
+  };
+
+  /* inicializa imediatamente (o script fica no fim do body) e também no DOMContentLoaded */
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  }
+  boot();
+})();
+
+</script>
+</body>
+</html>

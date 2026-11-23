@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nexus Dossiê — Jogo de Empresas</title>
+  <link rel="stylesheet" href="style.css">
+  <script>
+  window.NX = window.NX || {
+    _msg: function(){ alert("O jogo nao carregou neste visualizador. Abra o arquivo jogo.html direto no navegador (Chrome, Edge ou Firefox), com duplo clique."); },
+    go: function(){ this._msg(); }, start: function(){ this._msg(); }, calc: function(){ this._msg(); },
+    csv: function(){ this._msg(); }, reset: function(){ this._msg(); }, configChanged: function(){}
+  };
+  </script>
+  <script>window.onerror=function(m,s,l){var d=document.getElementById("err");if(d){d.style.display="block";d.textContent="Erro no jogo: "+m+" (linha "+l+")";}};</script>
+
+</head>
+<body>
+<div id="err" class="err"></div>
+<noscript><div class="err">O JavaScript está desativado neste navegador. Ative o JavaScript ou abra o arquivo em outro navegador.</div></noscript>
+
+<header class="top">
+  <div class="brand">
+    <span class="logo">NX</span>
+    <div>
+      <h1>Nexus Dossiê</h1>
+      <p>Jogo de empresas · disputa pelo mercado de dossiês regulatórios</p>
+    </div>
+  </div>
+  <div class="status">
+    <span id="roundPill" class="pill">—</span>
+  </div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="regras" class="active" onclick="NX.go('regras')">Regras</button>
+  <button data-tab="config" onclick="NX.go('config')">Configuração</button>
+  <button data-tab="decisoes" onclick="NX.go('decisoes')">Decisões</button>
+  <button data-tab="resultados" onclick="NX.go('resultados')">Resultados</button>
+  <button data-tab="historico" onclick="NX.go('historico')">Histórico</button>
+</nav>
+
+<main>
+
+  <!-- ============ REGRAS ============ -->
+  <section id="tab-regras" class="tab active">
+    <div class="card intro">
+      <p class="lead">Vocês administram uma empresa que vende agentes de IA para dossiês regulatórios. A cada rodada, cada mesa toma <strong>4 decisões</strong>. No fim, vence quem tiver o <strong>maior caixa acumulado</strong>.</p>
+      <div class="actions">
+        <button class="btn primary" onclick="NX.go('config')">Começar: configurar as mesas</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Uma rodada em 4 passos</h2>
+      <div class="steps-grid">
+        <div class="step-card"><span class="step-n">1</span><strong>O mercado é anunciado</strong><p>Ex.: “esta rodada tem 16 clientes”.</p></div>
+        <div class="step-card"><span class="step-n">2</span><strong>Cada mesa decide</strong><p>Preço, marketing, qualidade e capacidade.</p></div>
+        <div class="step-card"><span class="step-n">3</span><strong>O facilitador lança</strong><p>As decisões de todas as mesas entram no sistema.</p></div>
+        <div class="step-card"><span class="step-n">4</span><strong>O placar aparece</strong><p>Clientes, receita, custo, lucro e caixa.</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>As 4 decisões, em linguagem simples</h2>
+      <table class="rules-table">
+        <thead>
+          <tr><th>Decisão</th><th>O que é</th><th>Efeito</th><th>Dica</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Preço</strong><br><small>R$ 5 a 12 mil</small></td>
+            <td>Quanto vocês cobram por cliente, por mês.</td>
+            <td><strong>Caro:</strong> menos clientes, mas mais receita por cliente.<br><strong>Barato:</strong> mais clientes, menos receita por cliente.</td>
+            <td>Não existe preço “certo”. Depende da estratégia.</td>
+          </tr>
+          <tr>
+            <td><strong>Marketing</strong><br><small>R$ 0 a 20 mil</small></td>
+            <td>Quanto gastam para serem conhecidos.</td>
+            <td>Mais marketing = mais clientes. Mas o gasto sai do lucro.</td>
+            <td>Não gaste para atrair mais do que consegue atender.</td>
+          </tr>
+          <tr>
+            <td><strong>Qualidade</strong><br><small>R$ 0 a 20 mil</small></td>
+            <td>Quanto investem em compliance e confiança.</td>
+            <td>Mais qualidade = mais clientes e menos risco.<br><strong>Abaixo de R$ 5 mil: perde 1 cliente.</strong></td>
+            <td>Não zere: o incidente custa mais que a economia.</td>
+          </tr>
+          <tr>
+            <td><strong>Capacidade</strong><br><small>4, 6 ou 8 clientes</small></td>
+            <td>Quantos clientes vocês conseguem atender.</td>
+            <td>Mais capacidade = atende mais, mas custa mais.<br>Se atrair mais que a capacidade, o cliente vai para o concorrente.</td>
+            <td>Combine a capacidade com o marketing.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Exemplo de uma rodada (mercado de 16 clientes)</h2>
+      <div class="table-wrap">
+        <table class="rules-table">
+          <thead>
+            <tr><th>Mesa</th><th>Preço</th><th>Marketing</th><th>Qualidade</th><th>Capacidade</th><th>Clientes</th><th>Lucro</th><th>Caixa</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Mesa 1</td><td>8</td><td>10</td><td>10</td><td>6</td><td>4</td><td>R$ 39 mil</td><td>R$ 39 mil</td></tr>
+            <tr><td>Mesa 2</td><td>6</td><td>15</td><td>5</td><td>8</td><td>6</td><td>R$ 39 mil</td><td>R$ 39 mil</td></tr>
+            <tr><td>Mesa 3</td><td>11</td><td>5</td><td>15</td><td>6</td><td>3</td><td>R$ 44 mil</td><td>R$ 44 mil</td></tr>
+            <tr><td>Mesa 4</td><td>8</td><td>5</td><td>5</td><td>4</td><td>3</td><td>R$ 33 mil</td><td>R$ 33 mil</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted">A Mesa 3 cobrou mais caro e investiu em qualidade: ganhou menos clientes, mas teve o maior lucro. A Mesa 2 comprou volume com preço baixo. Nenhuma está “errada” — o jogo premia a estratégia coerente, não o lance mais alto em uma variável.</p>
+    </div>
+
+    <div class="card">
+      <h2>Como o placar é calculado</h2>
+      <p>Em três ideias:</p>
+      <ol class="steps">
+        <li><strong>Quem é mais atrativo ganha mais clientes.</strong> Qualidade e marketing aumentam a atratividade; preço alto diminui.</li>
+        <li><strong>Ninguém atende além da capacidade.</strong> O cliente que não cabe vai para um concorrente com vaga.</li>
+        <li><strong>Lucro = receita − custos.</strong> Receita é clientes × preço × 3 meses. Custos são o fixo, o que vocês gastaram e o custo por cliente.</li>
+      </ol>
+      <details class="formula-details">
+        <summary>Ver as fórmulas (para quem quiser conferir)</summary>
+        <div class="formula">
+          <p><span class="tag">1</span> <strong>Atratividade</strong> = (1 + qualidade÷10) × (1 + marketing÷10) ÷ (preço÷8)<sup>1,5</sup></p>
+          <p><span class="tag">2</span> <strong>Clientes</strong> = mercado × (atratividade ÷ soma das atratividades), limitado pela capacidade</p>
+          <p><span class="tag">3</span> <strong>Receita</strong> = clientes × preço × 3 meses</p>
+          <p><span class="tag">4</span> <strong>Custos</strong> = 15 (fixo) + marketing + qualidade + custo da capacidade + 2 × clientes</p>
+          <p><span class="tag">5</span> <strong>Lucro</strong> = receita − custos · <strong>Caixa</strong> = caixa anterior + lucro</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="card">
+      <h2>Dicas para a primeira rodada</h2>
+      <ul class="bullets">
+        <li>Escolham uma estratégia antes de decidir: <strong>volume</strong> (preço baixo), <strong>valor</strong> (preço alto + qualidade) ou <strong>equilíbrio</strong>.</li>
+        <li>Olhem a capacidade antes do marketing: não adianta atrair cliente que não cabe.</li>
+        <li>Não zerem a qualidade: abaixo de R$ 5 mil vocês perdem cliente.</li>
+        <li>O vencedor é o <strong>caixa acumulado</strong>, não o lucro de uma rodada só.</li>
+      </ul>
+      <div class="actions">
+        <button class="btn primary" onclick="NX.go('config')">Começar: configurar as mesas</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONFIGURAÇÃO ============ -->
+  <section id="tab-config" class="tab">
+    <div class="card">
+      <h2>Configuração da partida</h2>
+      <div class="grid-config">
+        <label>Número de mesas
+          <input id="cfgTeams" type="number" min="2" max="8" value="4" oninput="NX.configChanged()">
+        </label>
+        <label>Rodadas
+          <input id="cfgRounds" type="number" min="1" max="5" value="3">
+        </label>
+        <label>Caixa inicial (R$ mil)
+          <input id="cfgCash" type="number" min="0" max="500" value="0">
+        </label>
+        <label>Mercado por rodada
+          <input id="cfgMarket" type="text" value="16, 20, 24" placeholder="ex.: 16, 20, 24">
+        </label>
+      </div>
+      <p class="muted">O mercado é o número de clientes disponíveis em cada rodada. Se você informar menos valores que rodadas, o último se repete.</p>
+      <h3>Nomes das mesas</h3>
+      <div id="teamNames" class="team-names"></div>
+      <div class="actions">
+        <button class="btn primary" id="btnStart" onclick="NX.start()">Criar jogo</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DECISÕES ============ -->
+  <section id="tab-decisoes" class="tab">
+    <div class="card">
+      <div class="round-head">
+        <h2 id="decTitle">Decisões da rodada</h2>
+        <span id="decMarket" class="pill soft"></span>
+      </div>
+      <p class="muted" id="decHint"></p>
+      <div class="table-wrap">
+        <table class="dec-table" id="decTable">
+          <thead>
+            <tr>
+              <th>Mesa</th>
+              <th>Preço<br><small>R$ mil/cliente/mês</small></th>
+              <th>Marketing<br><small>R$ mil</small></th>
+              <th>Qualidade<br><small>R$ mil</small></th>
+              <th>Capacidade<br><small>clientes</small></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="btnCalc" onclick="NX.calc()">Calcular rodada</button>
+        <span id="calcMsg" class="msg"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RESULTADOS ============ -->
+  <section id="tab-resultados" class="tab">
+    <div id="resWrap"></div>
+  </section>
+
+  <!-- ============ HISTÓRICO ============ -->
+  <section id="tab-historico" class="tab">
+    <div class="card">
+      <h2>Histórico</h2>
+      <div id="histWrap"></div>
+      <div class="actions">
+        <button class="btn" id="btnCsv" onclick="NX.csv()">Exportar CSV</button>
+        <button class="btn danger" id="btnReset" onclick="NX.reset()">Nova partida</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <span>Nexus Agro · jogo de empresas para a disciplina de Empreendedorismo em CD e IA</span>
+</footer>
+
+<script src="sim.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
