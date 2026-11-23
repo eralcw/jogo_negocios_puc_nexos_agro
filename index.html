@@ -38,6 +38,7 @@
   <button data-tab="decisoes" onclick="NX.go('decisoes')">Decisões</button>
   <button data-tab="resultados" onclick="NX.go('resultados')">Resultados</button>
   <button data-tab="historico" onclick="NX.go('historico')">Histórico</button>
+  <button data-tab="codigos" onclick="NX.go('codigos')">Códigos</button>
 </nav>
 
 <main>
@@ -48,6 +49,7 @@
       <p class="lead">Vocês administram uma empresa que vende agentes de IA para dossiês regulatórios. A cada rodada, cada mesa toma <strong>4 decisões</strong>. No fim, vence quem tiver o <strong>maior caixa acumulado</strong>.</p>
       <div class="actions">
         <button class="btn primary" onclick="NX.go('config')">Começar: configurar as mesas</button>
+        <button class="btn" onclick="NX.go('codigos')">Sou uma mesa (gerar código)</button>
       </div>
     </div>
 
@@ -200,6 +202,35 @@
       <div class="actions">
         <button class="btn primary" id="btnCalc" onclick="NX.calc()">Calcular rodada</button>
         <span id="calcMsg" class="msg"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CÓDIGOS ============ -->
+  <section id="tab-codigos" class="tab">
+    <div class="cards2">
+      <div class="card">
+        <h2>Sou uma mesa</h2>
+        <p class="muted">Escolha as decisões e gere um código. Mostre o código para o facilitador (ou envie por mensagem).</p>
+        <div class="grid-config">
+          <label>Mesa (número ou nome)<input id="genMesa" type="text" value="1"></label>
+          <label>Preço (R$ 5–12 mil)<input id="genPrice" type="number" min="5" max="12" step="0.5" value="8"></label>
+          <label>Marketing (R$ 0–20 mil)<input id="genMkt" type="number" min="0" max="20" step="1" value="8"></label>
+          <label>Qualidade (R$ 0–20 mil)<input id="genQual" type="number" min="0" max="20" step="1" value="8"></label>
+          <label>Capacidade<select id="genCap"><option>4</option><option selected>6</option><option>8</option></select></label>
+        </div>
+        <div class="actions"><button class="btn primary" onclick="NX.genCode()">Gerar código</button></div>
+        <div id="genOut" class="code-out" style="display:none"></div>
+      </div>
+      <div class="card">
+        <h2>Sou o facilitador</h2>
+        <p class="muted">Cole um código por linha. O jogo preenche as decisões e calcula a rodada. Ex.: <span class="mono">M1-8-10-10-6</span> ou <span class="mono">Agro X;8;10;10;6</span>.</p>
+        <textarea id="codesIn" rows="7" placeholder="M1-8-10-10-6&#10;M2-6-15-5-8"></textarea>
+        <div class="actions">
+          <button class="btn primary" onclick="NX.applyAndCalc()">Aplicar e calcular</button>
+          <button class="btn" onclick="NX.applyCodes()">Só aplicar</button>
+        </div>
+        <div id="codesMsg" class="muted"></div>
       </div>
     </div>
   </section>

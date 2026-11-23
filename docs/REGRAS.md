@@ -150,3 +150,23 @@ Uma por mesa, por rodada.
 3. Não zerem qualidade: o incidente custa mais do que a economia.
 4. Anotem o caixa a cada rodada — é ele que define o vencedor, não o lucro de uma rodada só.
 5. Ajustem com base no placar, não no palpite.
+
+---
+
+## 11. Um celular por mesa (modo código)
+
+Cada mesa pode usar o próprio celular, sem internet e sem instalar nada.
+
+1. Cada mesa abre o `jogo.html`, vai na aba **Códigos** e escolhe **Sou uma mesa**.
+2. Informa o número ou nome da mesa e as 4 decisões.
+3. Clica em **Gerar código** e mostra (ou envia) o código ao facilitador.
+   Exemplo: `M3-8-10-10-6` = mesa 3, preço 8, marketing 10, qualidade 10, capacidade 6.
+4. O facilitador abre o jogo no aparelho dele, configura a partida com as mesmas mesas e, em **Códigos → Sou o facilitador**, cola um código por linha.
+5. Clica em **Aplicar e calcular**. O jogo preenche as decisões e mostra o placar.
+
+**Formatos aceitos:**
+- `M3-8-10-10-6` (mesa por número)
+- `Agro X;8;10;10;6` (mesa por nome)
+- separadores `-`, `;`, `|` ou `,`
+
+Se um código não for reconhecido, o jogo avisa e mostra qual linha ficou de fora.

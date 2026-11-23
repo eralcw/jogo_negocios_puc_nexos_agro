@@ -276,6 +276,103 @@
     }
   }
 
+  /* ---------------- códigos por mesa ---------------- */
+  function toNum(x) { var v = parseFloat(String(x).replace(",", ".")); return isNaN(v) ? null : v; }
+
+  function parseCode(raw) {
+    var s = String(raw || "").trim();
+    if (!s) return null;
+    var m = s.match(/^M?(\d+)\s*[-;|,]\s*([\d.,]+)\s*[-;|,]\s*([\d.,]+)\s*[-;|,]\s*([\d.,]+)\s*[-;|,]\s*([\d.,]+)$/i);
+    if (m) {
+      return { name: "Mesa " + m[1], price: toNum(m[2]), marketing: toNum(m[3]), quality: toNum(m[4]), capacity: toNum(m[5]) };
+    }
+    var parts = s.split(/\s*[;|]\s*/);
+    if (parts.length === 5) {
+      return { name: parts[0].trim(), price: toNum(parts[1]), marketing: toNum(parts[2]), quality: toNum(parts[3]), capacity: toNum(parts[4]) };
+    }
+    return null;
+  }
+
+  function genCode() {
+    var mesa = ($("#genMesa").value || "1").trim();
+    var p = clampNum($("#genPrice").value, 5, 12, 8);
+    var m = clampNum($("#genMkt").value, 0, 20, 8);
+    var q = clampNum($("#genQual").value, 0, 20, 8);
+    var c = Number($("#genCap").value) || 6;
+    var code = /^\d+$/.test(mesa) ? ("M" + mesa + "-" + p + "-" + m + "-" + q + "-" + c) : (mesa + ";" + p + ";" + m + ";" + q + ";" + c);
+    var out = $("#genOut");
+    out.style.display = "block";
+    out.innerHTML = '<div class="code-label">CÓDIGO DA MESA</div><div class="code-value" id="codeValue">' + esc(code) + '</div><div class="actions"><button class="btn" onclick="NX.copy()">Copiar</button></div>';
+  }
+
+  function copyCode() {
+    var el = $("#codeValue");
+    if (!el) return;
+    var text = el.textContent;
+    function fallback() {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+    if (typeof navigator !== "undefined" && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {}, fallback);
+    } else {
+      fallback();
+    }
+  }
+
+  function applyCodes() {
+    var msg = $("#codesMsg");
+    if (!S.started) { msg.textContent = "Configure a partida primeiro (aba Configuração)."; return; }
+    var lines = String($("#codesIn").value || "").split(/\r?\n/).map(function (x) { return x.trim(); }).filter(Boolean);
+    if (!lines.length) { msg.textContent = "Cole ao menos um código."; return; }
+    var used = {}, applied = 0, bad = [];
+    lines.forEach(function (line) {
+      var c = parseCode(line);
+      if (!c) { bad.push(line); return; }
+      var idx = -1, i;
+      for (i = 0; i < S.teams.length; i++) {
+        if (!used[i] && S.teams[i].name.toLowerCase() === c.name.toLowerCase()) { idx = i; break; }
+      }
+      if (idx === -1) {
+        var mm = c.name.match(/^mesa\s*(\d+)$/i);
+        if (mm) {
+          var k = parseInt(mm[1], 10) - 1;
+          if (k >= 0 && k < S.teams.length && !used[k]) { idx = k; }
+        }
+      }
+      if (idx === -1) {
+        for (i = 0; i < S.teams.length; i++) { if (!used[i]) { idx = i; break; } }
+      }
+      if (idx === -1) { bad.push(line); return; }
+      used[idx] = true;
+      var cap = toNum(c.capacity);
+      S.decisions[idx] = {
+        price: clampNum(c.price, 5, 12, 8),
+        marketing: clampNum(c.marketing, 0, 20, 8),
+        quality: clampNum(c.quality, 0, 20, 8),
+        capacity: (cap === 4 || cap === 6 || cap === 8) ? cap : 6
+      };
+      applied++;
+    });
+    save();
+    msg.textContent = applied + " código(s) aplicado(s)" + (bad.length ? " · " + bad.length + " não reconhecido(s): " + bad.join(" | ") : "") + ".";
+    return applied;
+  }
+
+  function applyCodesOnly() {
+    var a = applyCodes();
+    if (a) { go("decisoes"); }
+  }
+
+  function applyCodesAndCalc() {
+    var a = applyCodes();
+    if (a) { go("decisoes"); calculate(); }
+  }
+
   /* expõe para os onclick do HTML */
   window.NX = {
     go: go,
@@ -283,7 +380,12 @@
     calc: calculate,
     csv: exportCsv,
     reset: resetGame,
-    configChanged: renderConfig
+    configChanged: renderConfig,
+    genCode: genCode,
+    applyCodes: applyCodesOnly,
+    applyAndCalc: applyCodesAndCalc,
+    copy: copyCode,
+    parseCode: parseCode
   };
 
   /* inicializa imediatamente (o script fica no fim do body) e também no DOMContentLoaded */

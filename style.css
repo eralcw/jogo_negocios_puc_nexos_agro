@@ -227,3 +227,19 @@ input:focus,select:focus{outline:none;border-color:var(--accent)}
   .dec-table td[data-label]::before{content:attr(data-label);font-family:var(--mono);font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left}
   .dec-table input,.dec-table select{max-width:130px;padding:.6rem}
 }
+
+/* códigos por mesa */
+.cards2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.cards2>.card{margin-bottom:0}
+textarea{
+  width:100%;font-family:var(--mono);font-size:1rem;padding:.6rem;
+  background:var(--bg);border:1px solid var(--line);color:var(--ink);border-radius:0;resize:vertical;
+}
+textarea:focus{outline:none;border-color:var(--accent)}
+.code-out{margin-top:1rem;border:1px solid var(--accent);background:var(--panel2);padding:1rem}
+.code-label{font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
+.code-value{font-family:var(--mono);font-size:1.7rem;font-weight:700;color:var(--accent);letter-spacing:.04em;word-break:break-all;margin:.3rem 0 .6rem;user-select:all}
+@media (max-width:760px){
+  .cards2{grid-template-columns:1fr}
+  .code-value{font-size:1.35rem}
+}

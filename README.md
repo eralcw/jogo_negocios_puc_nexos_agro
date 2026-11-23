@@ -121,3 +121,14 @@ Verificam: divisão do mercado, efeito do preço, limite de capacidade, incident
 ## Créditos
 
 Projeto acadêmico — PUC-SP, Ciência de Dados e Inteligência Artificial, disciplina Empreendedorismo em CD e IA (Prof. Wagner Tufano). Tema inspirado no plano de negócios da Nexus Agro.
+
+---
+
+## Um celular por mesa (modo código)
+
+Sem servidor e sem internet: cada mesa gera um código no próprio celular e o facilitador cola os códigos no aparelho dele.
+
+1. Na aba **Códigos**, a mesa usa **Sou uma mesa**: escolhe as 4 decisões e clica em **Gerar código** (ex.: `M3-8-10-10-6`).
+2. O facilitador usa **Sou o facilitador**: cola um código por linha e clica em **Aplicar e calcular**.
+
+Formatos: `M3-8-10-10-6` ou `Agro X;8;10;10;6` (separadores `-`, `;`, `|` ou `,`).
