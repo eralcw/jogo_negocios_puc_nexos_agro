@@ -113,10 +113,10 @@
       var tr = document.createElement("tr");
       tr.innerHTML =
         "<td>" + esc(t.name) + "</td>" +
-        '<td><input type="number" min="5" max="12" step="0.5" value="' + d.price + '" data-k="price"></td>' +
-        '<td><input type="number" min="0" max="20" step="1" value="' + d.marketing + '" data-k="marketing"></td>' +
-        '<td><input type="number" min="0" max="20" step="1" value="' + d.quality + '" data-k="quality"></td>' +
-        '<td><select data-k="capacity">' +
+        '<td data-label="Preço"><input type="number" min="5" max="12" step="0.5" value="' + d.price + '" data-k="price"></td>' +
+        '<td data-label="Marketing"><input type="number" min="0" max="20" step="1" value="' + d.marketing + '" data-k="marketing"></td>' +
+        '<td data-label="Qualidade"><input type="number" min="0" max="20" step="1" value="' + d.quality + '" data-k="quality"></td>' +
+        '<td data-label="Capacidade"><select data-k="capacity">' +
         '<option value="4"' + (d.capacity === 4 ? " selected" : "") + ">4</option>" +
         '<option value="6"' + (d.capacity === 6 ? " selected" : "") + ">6</option>" +
         '<option value="8"' + (d.capacity === 8 ? " selected" : "") + ">8</option>" +
@@ -221,8 +221,8 @@
           '<td class="' + (x.profit < 0 ? "neg" : "pos") + '">' + fmt(x.profit) + "</td><td>" + fmt(x.cash) + "</td></tr>";
       }).join("");
       return '<div class="hist-round"><h3>Rodada ' + r.round + " · mercado de " + r.marketSize + " clientes</h3>" +
-        '<table class="hist-table"><thead><tr><th>Empresa</th><th>Preço</th><th>Marketing</th><th>Qualidade</th><th>Capacidade</th><th>Clientes</th><th>Lucro</th><th>Caixa</th></tr></thead><tbody>' +
-        rows + "</tbody></table></div>";
+        '<div class="table-wrap"><table class="hist-table"><thead><tr><th>Empresa</th><th>Preço</th><th>Marketing</th><th>Qualidade</th><th>Capacidade</th><th>Clientes</th><th>Lucro</th><th>Caixa</th></tr></thead><tbody>' +
+        rows + "</tbody></table></div></div>";
     }).join("");
   }
 
