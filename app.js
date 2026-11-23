@@ -52,7 +52,7 @@
   function renderConfig() {
     var cfgTeams = $("#cfgTeams");
     if (!cfgTeams) return;
-    var n = clampInt(cfgTeams.value, 2, 8, 4);
+    var n = clampInt(cfgTeams.value, 1, 8, 4);
     var wrap = $("#teamNames");
     var current = $$("input", wrap).map(function (i) { return i.value; });
     wrap.innerHTML = "";
@@ -75,7 +75,7 @@
   }
 
   function startGame() {
-    var n = clampInt($("#cfgTeams").value, 2, 8, 4);
+    var n = clampInt($("#cfgTeams").value, 1, 8, 4);
     var rounds = clampInt($("#cfgRounds").value, 1, 5, 3);
     var cash = clampInt($("#cfgCash").value, 0, 500, 0);
     var market = parseMarket($("#cfgMarket").value, rounds);

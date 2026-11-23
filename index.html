@@ -154,7 +154,7 @@
       <h2>Configuração da partida</h2>
       <div class="grid-config">
         <label>Número de mesas
-          <input id="cfgTeams" type="number" min="2" max="8" value="4" oninput="NX.configChanged()">
+          <input id="cfgTeams" type="number" min="1" max="8" value="4" oninput="NX.configChanged()">
         </label>
         <label>Rodadas
           <input id="cfgRounds" type="number" min="1" max="5" value="3">
@@ -166,7 +166,7 @@
           <input id="cfgMarket" type="text" value="16, 20, 24" placeholder="ex.: 16, 20, 24">
         </label>
       </div>
-      <p class="muted">O mercado é o número de clientes disponíveis em cada rodada. Se você informar menos valores que rodadas, o último se repete.</p>
+      <p class="muted">O mercado é o número de clientes disponíveis em cada rodada. Se você informar menos valores que rodadas, o último se repete. Para jogar apenas com a sua mesa, use 1 mesa.</p>
       <h3>Nomes das mesas</h3>
       <div id="teamNames" class="team-names"></div>
       <div class="actions">

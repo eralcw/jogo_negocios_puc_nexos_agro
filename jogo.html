@@ -385,7 +385,7 @@ input:focus,select:focus{outline:none;border-color:var(--accent)}
       <h2>Configuração da partida</h2>
       <div class="grid-config">
         <label>Número de mesas
-          <input id="cfgTeams" type="number" min="2" max="8" value="4" oninput="NX.configChanged()">
+          <input id="cfgTeams" type="number" min="1" max="8" value="4" oninput="NX.configChanged()">
         </label>
         <label>Rodadas
           <input id="cfgRounds" type="number" min="1" max="5" value="3">
@@ -397,7 +397,7 @@ input:focus,select:focus{outline:none;border-color:var(--accent)}
           <input id="cfgMarket" type="text" value="16, 20, 24" placeholder="ex.: 16, 20, 24">
         </label>
       </div>
-      <p class="muted">O mercado é o número de clientes disponíveis em cada rodada. Se você informar menos valores que rodadas, o último se repete.</p>
+      <p class="muted">O mercado é o número de clientes disponíveis em cada rodada. Se você informar menos valores que rodadas, o último se repete. Para jogar apenas com a sua mesa, use 1 mesa.</p>
       <h3>Nomes das mesas</h3>
       <div id="teamNames" class="team-names"></div>
       <div class="actions">
@@ -666,7 +666,7 @@ input:focus,select:focus{outline:none;border-color:var(--accent)}
   function renderConfig() {
     var cfgTeams = $("#cfgTeams");
     if (!cfgTeams) return;
-    var n = clampInt(cfgTeams.value, 2, 8, 4);
+    var n = clampInt(cfgTeams.value, 1, 8, 4);
     var wrap = $("#teamNames");
     var current = $$("input", wrap).map(function (i) { return i.value; });
     wrap.innerHTML = "";
@@ -689,7 +689,7 @@ input:focus,select:focus{outline:none;border-color:var(--accent)}
   }
 
   function startGame() {
-    var n = clampInt($("#cfgTeams").value, 2, 8, 4);
+    var n = clampInt($("#cfgTeams").value, 1, 8, 4);
     var rounds = clampInt($("#cfgRounds").value, 1, 5, 3);
     var cash = clampInt($("#cfgCash").value, 0, 500, 0);
     var market = parseMarket($("#cfgMarket").value, rounds);
